@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const productSchema = new Schema({
-  externalId : {
-    type : String,
-    required : true,
-    unique: true
+  externalId : { 
+    type: String, 
+    required: true, 
+    unique: true 
   },
   name: {
     type: String,
@@ -27,7 +27,8 @@ const productSchema = new Schema({
   },
   supplier: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Supplier'
+    ref: 'Supplier',
+    required: true
   },
   createdAt: {
     type: Date,

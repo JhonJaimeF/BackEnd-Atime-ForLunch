@@ -3,23 +3,37 @@ const Supplier = require("../models/supplier");
 
 module.exports = {
     'createProduct' : async (req, res) => {
-        const { id, name, description, price,category,supplier} = req.body;
-        const existingProduct = await Product.findOne({id: id});
+        const { externalId, name, description, price,category,supplier} = req.body;
         try {
+            const existingProduct = await Product.findOne({externalId});
+        
             if (existingProduct) { 
                 return res.status(400).json({ state: false, message: "El producto ya existe." }); 
             }
 
-            const newProduct = new Product({ id, name, description,price,category,supplier,createdAt: new Date(), updatedAt: new Date()}); 
+            // Verificar si el proveedor existe 
+            const existingSupplier = await Supplier.findById(supplier); 
+            if (!existingSupplier) { 
+                return res.status(400).json({ state: false, message: "El proveedor no existe." }); 
+            }
+
+            const newProduct = new Product({ 
+                externalId, 
+                name, 
+                description,
+                price,
+                category,
+                supplier,
+                createdAt: new Date(),
+                updatedAt: new Date()}); 
          
-            const savedProduct = await newProduct.save(newProduct);
-            Supplier.product.push(newProduct);
+
+            const savedProduct = await newProduct.save(); 
+            await Supplier.findByIdAndUpdate(supplier, { $push: { Product:savedProduct._id } }); 
+
             return res.status(201).json({ state: true, data: savedProduct }); 
-
-            
-        } catch (error) {
-            return res.status(500).json({ state: false, message: error });
-
+        } catch (error) { 
+            return res.status(500).json({ state: false, message: error.message }); 
         }
     },
     'listProducts' : async (req, res) => {
@@ -33,12 +47,12 @@ module.exports = {
 
     },
     'updateProduct': async (req, res) => {
-        const { id } = req.params; const updates = req.body;
-        try { 
-            const updatedProduct = await Product.findByIdAndUpdate(id, updates, { new: true }); 
-            
-            if (!updatedProduct) { 
-            return res.status(404).json({ state: false, message: "Producto no encontrado." }); } 
+        const { id } = req.params; 
+        const updates = req.body; 
+        try { const updatedProduct = await Product.findByIdAndUpdate(id, updates, { new: true }); 
+        if (!updatedProduct) { 
+            return res.status(404).json({ state: false, message: "Producto no encontrado." }); 
+        } 
             return res.status(200).json({ state: true, data: updatedProduct }); 
         } catch (error) { 
             return res.status(500).json({ state: false, message: error.message }); 
@@ -47,17 +61,16 @@ module.exports = {
     'DeleteProduct': async (req, res) => {
         
         const { id } = req.params; 
-        try { 
-
-            const deletedProduct = await Product.findByIdAndDelete(id);
+        try { const deletedProduct = await Product.findByIdAndDelete(id); 
             if (!deletedProduct) { 
                 return res.status(404).json({ state: false, message: "Producto no encontrado." }); 
-            } // Desvincular producto del proveedor await Supplier.
-            findByIdAndUpdate(deletedProduct.supplier, { $pull: { Product: deletedProduct._id } }); 
+            } 
+            
+            await Supplier.findByIdAndUpdate(deletedProduct.supplier, { $pull: { Product: deletedProduct._id } }); 
             return res.status(200).json({ state: true, message: "Producto eliminado." }); 
         } catch (error) { 
-            return res.status(500).json({ state: false, message: error.message }); 
-        }
+        return res.status(500).json({ state: false, message: error.message }); 
+    }
 
     },
     'findById': async (req, res) => {
@@ -73,14 +86,5 @@ module.exports = {
             return res.status(500).json({ state: false, message: errormessage }); 
         }
 
-    },
-    'findByCategory': async (req, res) => {
-        const { category } = req.params; 
-        try { 
-            const products = await Product.find({ category }).populate('supplier'); 
-            return res.status(200).json({ state: true, data: products });
-        } catch (error) { 
-        return res.status(500).json({ state: false, message: error.message }); 
-        }
     },
 }

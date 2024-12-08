@@ -5,14 +5,15 @@ module.exports = {
     'addProductsInventory': async (req, res) => { 
         const {product, quantity } = req.body; 
         try { 
-            const existProductInventory = await Inventory.findOne({ externalId }); if (existProductInventory) { 
+            const existProductInventory = await Inventory.findOne({ product: product }); if (existProductInventory) { 
                 return res.status(400).send({ state: false, message: "El producto ya existe en el inventario." }); 
-            }  
+            }
+
             const existingProduct = await Product.findById(product); 
             if (!existingProduct) { 
                 return res.status(400).send({ state: false, message: "El producto no existe." }); 
             } 
-            const newProductInventory = new Inventory({ externalId, product, quantity, createdAt: new Date(), updatedAt: new Date() }); 
+            const newProductInventory = new Inventory({product, quantity, createdAt: new Date(), updatedAt: new Date() }); 
 
             const savedProductInventory = await newProductInventory.save(); 
 

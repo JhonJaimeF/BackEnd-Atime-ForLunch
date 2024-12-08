@@ -33,22 +33,16 @@ module.exports = {
         }
 
     },
-    'updateProduct': async (req,res) => {
-        const { id } = req.params; 
-        const updates = req.body;
-        
+    'updateProduct': async (req, res) => { 
+        const { id } = req.params; const { cantidad } = req.body; 
         try {
-
-            const updatedProduct = await Inventory.findByIdAndUpdate(id, updates, {new: true }); 
-
-            if (!updatedProduct) { 
-                return res.status(404).json({ state: false, message: "Producto no encontrado." }); 
-            } 
-
-            return res.status(200).json({ state: true, data: updatedProduct }); 
-        } catch (error) { 
-            return res.status(500).json({ state: false, message: error.message }); 
-        }
+            const updatedProduct = await Inventory.findByIdAndUpdate( id, { $set: { cantidad } },{ new: true } ); 
+                if (!updatedProduct) { 
+                return res.status(404).json({ state: false, message: "Producto no encontrado." }); } 
+                return res.status(200).json({ state: true, data: updatedProduct }); 
+            } catch (error) {
+                 return res.status(500).json({ state: false, message: error.message }); 
+                } 
     },
     'findById': async (req,res) => {
 

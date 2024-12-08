@@ -39,7 +39,8 @@ module.exports = {
     'listProducts' : async (req, res) => {
 
         try { 
-            const products = await Product.find().populate('supplier'); 
+            //const products = await Product.find().populate('supplier'); 
+            const products = await Product.find(); 
             return res.status(200).json({ state: true, data: products }); 
         } catch (error) { 
             return res.status(500).json({ state: false, message: error.message }); 
@@ -77,7 +78,7 @@ module.exports = {
 
         const { id } = req.params; 
         try { 
-            const product = await Product.findById(id).populate('supplier'); 
+            const product = await Product.findById(id); 
             if (!product) { 
                 return res.status(404).json({ state: false, message: "Producto no encontrado." }); 
             } 

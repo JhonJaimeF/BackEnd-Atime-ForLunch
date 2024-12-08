@@ -20,5 +20,6 @@ app.use(cors())
 //middleware
 app.use('/supplier',require('./routes/supplier'))
 app.use('/product',require('./routes/products'))
+app.use('/inventory',require('./routes/inventory'))
 
 app.listen(app.get('PORT'), () => console.log(`Server Ready at http://localhost:${app.get('PORT')}`))

@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
+
 
 const {Schema} = mongoose;
 
 const SchemaInventory = new Schema({
-  externalId: {
-    type: String,
-    required: true,
-    unique: true,
+  externalId: { 
+    type: Number, 
+    unique: true 
   },
   product : {
     type: Schema.Types.ObjectId,
@@ -15,10 +16,13 @@ const SchemaInventory = new Schema({
   },  
   quantity: { 
     type: Number, 
-    required: true 
+    required: true,
+    min : 0 
   },
   
 })
+
+SchemaInventory.plugin(AutoIncrement, { inc_field: 'externalId'});
 
 const Inventory = mongoose.model('Inventory',SchemaInventory,);
 module.exports = Inventory;

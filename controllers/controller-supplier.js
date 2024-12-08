@@ -53,9 +53,9 @@ module.exports = {
     'findById': async (req, res) => { 
         const { id } = req.params; // Aquí usamos el _id generado por MongoDB 
         try { 
-            const supplier = await Supplier.findById(id); 
+            const supplier = await Supplier.findById(id).populate('products'); 
             if (!supplier) { 
-                return res.status(404).json({ state: false, message: "Proveedor no encontrado." }); 
+                return res.status(404).json({ state: false, message: "Proveedor no encontrado."}); 
             } 
             return res.status(200).json({ state: true, data: supplier });
          } 

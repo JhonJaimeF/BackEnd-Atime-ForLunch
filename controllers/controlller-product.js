@@ -1,4 +1,5 @@
 const Product = require("../models/product");
+const mongoose = require('mongoose');
 const Supplier = require("../models/supplier");
 
 module.exports = {
@@ -88,4 +89,18 @@ module.exports = {
         }
 
     },
+    'listProductsBySupplier': async (req, res) => {
+        const { id } = req.params; 
+        try { 
+            // Convertir el id a un ObjectId de MongoDB 
+            const objectId = new mongoose.Types.ObjectId(id); 
+            const products = await Product.find({ supplier: objectId }); 
+            if (!products || products.length === 0) { 
+                return res.status(400).json({ state: false, message: "No se encontraron productos asociados" }); 
+            } 
+            return res.status(200).json({ state: true, data: products }); 
+        } catch (error) { 
+            return res.status(500).json({ state: false, message: error.message }); 
+        }
+    }
 }

@@ -5,7 +5,8 @@ const {
     listProducts,
     DeleteProduct,
     updateProduct,
-    findById
+    findById,
+    listProductsBySupplier
     
 }= require('../controllers/controlller-product')
 
@@ -18,5 +19,7 @@ routes.delete("/:id", DeleteProduct);
 routes.get("/", listProducts);
 
 routes.get("/:id", findById );
+
+routes.get("/supplier/:id", listProductsBySupplier);
 
 module.exports = routes;
